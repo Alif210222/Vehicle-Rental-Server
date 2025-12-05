@@ -29,7 +29,7 @@ export const pool = new Pool({
         vehicle_name VARCHAR(100) NOT NULL,
         type VARCHAR(150) UNIQUE NOT NULL,
         registration_number VARCHAR(20) NOT NULL,
-        daily_rent_price VARCHAR(20) NOT NULL,
+        daily_rent_price NUMERIC NOT NULL,
         availability_status TEXT NOT NULL
         )
         `);

@@ -8,7 +8,7 @@ const router = Router();
 router.post("/", vehicleController.addVehicle)
 router.get("/", vehicleController.getAllVehicle)
 router.get("/:vehicleId", vehicleController.getSingleVehicle)
-//Update
+router.put("/:vehicleId", vehicleController.updateVehicle)
 router.delete("/:vehicleId", vehicleController.deleteVehicle)
 
 
