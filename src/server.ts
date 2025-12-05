@@ -4,6 +4,7 @@ import { Pool } from "pg";
 import initDB from "./config/db";
 import { userRoute } from "./modules/user/user.route";
 import { vehicleRoute } from "./modules/vehicle/vehicle.route";
+import { bookingRoute } from "./modules/booking/book.route";
 
 const app = express()
 const port = config.port;
@@ -14,10 +15,13 @@ initDB();
 
 
 //User Reg. 
-app.use("/api/v1/auth/users",userRoute)   //* signup
+app.use("/api/v1/auth/signup",userRoute)   //* signup
 
 //Vehicle 
 app.use("/api/v1/vehicles",vehicleRoute)
+
+//booking
+app.use("/api/v1/bookings",bookingRoute)
 
 
 

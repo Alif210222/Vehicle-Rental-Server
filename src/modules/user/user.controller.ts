@@ -31,7 +31,7 @@ const getUser = async(req:Request,res:Response)=>{
 
         res.status(201).json({
             success: true,
-            message:"user reached successful",
+            message:"Users retrieved successfully",
             data:result.rows
         })
     } catch (error:any) {
