@@ -5,6 +5,7 @@ const router = Router();
 
 router.post("/", bookingController.createBooking)
 router.get("/", bookingController.getBooking)
+router.put("/:bookingId", bookingController.updateBooking)
 
 
 

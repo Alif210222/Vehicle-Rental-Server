@@ -95,7 +95,7 @@ const getUser = async(req:Request,res:Response)=>{
     } catch (error:any) {
            res.status(500).json({
              success: false,
-             message:"Upate request failed !",
+             message:"Update request failed !",
            })        
   }}
 
