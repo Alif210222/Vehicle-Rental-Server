@@ -44,6 +44,10 @@ const createBooking = async (
   );
    const booking = bookingResult.rows[0];
 
+
+   // 4. Update vehicle status to "booked"
+    await pool.query(`UPDATE vehicles SET availability_status='booked' WHERE id=$1`, [vehicle_id]);
+
   // 5. Attach vehicle info inside booking object
   booking.vehicle = {
     vehicle_name: vehicle.vehicle_name,
@@ -57,10 +61,18 @@ const createBooking = async (
 
 // Get all booking 
 
-  const getAllBooking =async()=>{
-        const result = await pool.query(`SELECT * FROM bookings`)
-        return result;
-  }
+ const getAllBooking = async (role: string, userId: number) => {
+
+    if (role === "admin") {
+        return await pool.query(`SELECT * FROM bookings`);
+    }
+
+    // customer
+    return await pool.query(
+        `SELECT * FROM bookings WHERE customer_id = $1`,
+        [(userId)]
+    );
+};
 
 
 //  Update booking data 

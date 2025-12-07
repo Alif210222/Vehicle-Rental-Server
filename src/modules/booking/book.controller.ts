@@ -15,7 +15,7 @@ const  createBooking = async(req:Request,res:Response)=>{
     } catch (error:any) {
           console.error("Booking creation error:", error.message);
            res.status(500).json({
-               success: false,
+               success: true,
                message:"Booking creation failed",
                error: error.message
   })        
@@ -23,9 +23,9 @@ const  createBooking = async(req:Request,res:Response)=>{
 
 
 const  getBooking = async (req:Request,res:Response) =>{
-       
+          const { role, id } = req.user!;
        try {
-             const result = await bookingService.getAllBooking();
+              const result = await bookingService.getAllBooking(role,id);
                 
           res.status(201).json({
             success: true,
@@ -41,6 +41,9 @@ const  getBooking = async (req:Request,res:Response) =>{
         
        }
 }
+
+
+
 
 const updateBooking = async (req:Request,res:Response)=>{
     const {customer_id, vehicle_id, rent_start_date, rent_end_date, total_price,status } = req.body;

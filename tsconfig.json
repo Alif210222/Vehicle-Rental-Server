@@ -10,7 +10,8 @@
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "bundler",
-    "types": ["node"],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "types": ["node", "express"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],

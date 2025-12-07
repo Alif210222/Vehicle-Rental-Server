@@ -1,15 +1,16 @@
 import { Request, Response, Router } from "express";
 import { vehicleController } from "./vehicle.controler";
+import auth from "../../middleware/auth";
 
 
 
 const router = Router();
 
-router.post("/", vehicleController.addVehicle)
+router.post("/",auth("admin"), vehicleController.addVehicle)
 router.get("/", vehicleController.getAllVehicle)
 router.get("/:vehicleId", vehicleController.getSingleVehicle)
-router.put("/:vehicleId", vehicleController.updateVehicle)
-router.delete("/:vehicleId", vehicleController.deleteVehicle)
+router.put("/:vehicleId",auth("admin"), vehicleController.updateVehicle)
+router.delete("/:vehicleId",auth("admin"), vehicleController.deleteVehicle)
 
 
  
