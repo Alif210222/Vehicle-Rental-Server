@@ -17,7 +17,7 @@ initDB();
 
 
 //User Reg. 
-app.use("/api/v1/auth/signup",userRoute)   //* signup
+app.use("/api/v1",userRoute)   //* signup
 
 //Vehicle 
 app.use("/api/v1/vehicles",vehicleRoute)

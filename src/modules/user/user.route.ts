@@ -6,10 +6,10 @@ import auth from "../../middleware/auth";
 
 const router = Router();
 
-router.post("/", userController.createUser )
-router.get("/",auth("admin"), userController.getUser)
-router.get("/:userId", userController.getSingleUser)
-router.put("/:userId",auth("admin","customer"), userController.updateUser) 
-router.delete("/:userId",auth("admin"), userController.deleteUser) 
+router.post("/auth/signup", userController.createUser )
+router.get("/users",auth("admin"), userController.getUser)   //auth("admin"),
+router.get("/users/:userId", userController.getSingleUser)
+router.put("/users/:userId",auth("admin","customer"), userController.updateUser) 
+router.delete("/users/:userId",auth("admin"), userController.deleteUser) 
 
 export const userRoute = router
