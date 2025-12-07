@@ -1,0 +1,24 @@
+import bcrypt from "bcryptjs";
+import { pool } from "../../config/db";
+import jwt from "jsonwebtoken";
+import { config } from "../../config";
+const loginUser = async (email, password) => {
+    const result = await pool.query(`SELECT * FROM users WHERE email=$1`, [email]);
+    if (result.rows.length === 0) {
+        throw new Error("User not found");
+    }
+    const user = result.rows[0];
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+        throw new Error("Invalid credential");
+    }
+    ;
+    const secret = config.jwtSecret;
+    const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, secret, { expiresIn: "20d" });
+    //    console.log({token});
+    delete user.password;
+    return { token, user };
+};
+export const authService = {
+    loginUser,
+};
