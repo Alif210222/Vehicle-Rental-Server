@@ -10,17 +10,23 @@ export const pool = new Pool({
 // create db table  
     const initDB = async() =>{
      await pool.query(`
-        CREATE TABLE IF NOT EXISTS users(
-        id SERIAL PRIMARY KEY,
-        name  VARCHAR(100) NOT NULL,
-        email VARCHAR(150) UNIQUE NOT NULL
-        CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
-        CHECK (email = LOWER(email)),
-        password TEXT NOT NULL CHECK (char_length(password) >= 6),
-        phone VARCHAR(15) NOT NULL,
-        role VARCHAR(100) NOT NULL DEFAULT 'customer'
-        CHECK (role IN ('admin', 'customer'))
-        )
+
+    CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'customer',
+
+    -- Constraints
+    CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
+    CONSTRAINT email_lowercase CHECK (email = LOWER(email)),
+    CONSTRAINT valid_role CHECK (role IN ('admin', 'customer')),
+    CONSTRAINT password_min_length CHECK (char_length(password) >= 6)
+);
+
+        
         `);
         // vehicle 
        await pool.query(`

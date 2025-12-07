@@ -43,7 +43,18 @@ const  addVehicle  = async(vehicle_name:string,type:string,registration_number:s
 
 // delete V
   const deleteVehicle =  async(vehicleId : string)=>{
-          const result = await pool.query(`DELETE FROM vehicles WHERE id= $1`,[vehicleId])
+      
+        const bookingData = await pool.query(
+         `SELECT id FROM bookings WHERE vehicle_id = $1 AND status = 'active'`,[vehicleId]
+        )
+        if(bookingData.rows.length > 0){
+           throw new Error("Cannot delete this vehicle: Already booking exist") 
+        }
+
+          const result = await pool.query(`DELETE FROM vehicles WHERE id= $1 RETURNING *`,[vehicleId])
+
+        
+
           return result;
 }
 

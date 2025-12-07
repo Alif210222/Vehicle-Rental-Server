@@ -61,39 +61,131 @@ const createBooking = async (
 
 // Get all booking 
 
- const getAllBooking = async (role: string, userId: number) => {
+//  const getAllBooking = async (role: string, userId: number) => {
 
+
+
+
+
+//     if (role === "admin") {
+//         return await pool.query(`SELECT * FROM bookings`);
+//     }
+
+//     // customer
+//     return await pool.query(
+//         `SELECT * FROM bookings WHERE customer_id = $1`,
+//         [(userId)]
+//     );
+// };
+
+
+//--------
+
+
+const getAllBooking = async (role: string, userId: number) => {
     if (role === "admin") {
-        return await pool.query(`SELECT * FROM bookings`);
+        return await pool.query(
+            `SELECT 
+                b.id,
+                b.vehicle_id,
+                b.rent_start_date,
+                b.rent_end_date,
+                b.total_price,
+                b.status,
+                v.vehicle_name,
+                v.registration_number,
+                v.type
+            FROM bookings b
+            JOIN vehicles v ON b.vehicle_id = v.id`
+        );
     }
 
     // customer
     return await pool.query(
-        `SELECT * FROM bookings WHERE customer_id = $1`,
-        [(userId)]
+        `SELECT 
+            b.id,
+            b.vehicle_id,
+            b.rent_start_date,
+            b.rent_end_date,
+            b.total_price,
+            b.status,
+            v.vehicle_name,
+            v.registration_number,
+            v.type
+        FROM bookings b
+        JOIN vehicles v ON b.vehicle_id = v.id
+        WHERE b.customer_id = $1`,
+        [userId]
     );
 };
 
 
+
 //  Update booking data 
 
-   const  updateBooking = async(
-          customer_id: number,
-          vehicle_id: number,
-          rent_start_date: string,
-          rent_end_date: string,
-          total_price:string,
-          status:string,
-          bookingId:string
-        ) => {
+  //  const  updateBooking = async(
+  //         customer_id: number,
+  //         vehicle_id: number,
+  //         rent_start_date: string,
+  //         rent_end_date: string,
+  //         total_price:string,
+  //         status:string,
+  //         role:string,
+  //         bookingId:string
+  //       ) => {
             
-        const result = await pool.query(
-               `UPDATE bookings SET customer_id=$1, vehicle_id=$2, rent_start_date=$3, rent_end_date=$4, total_price=$5, status=$6 WHERE id=$7  RETURNING *`,
-               [customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status,bookingId ]
-        ) ;
-        return result;  
+  //       const result = await pool.query(
+  //              `UPDATE bookings SET customer_id=$1, vehicle_id=$2, rent_start_date=$3, rent_end_date=$4, total_price=$5, status=$6 WHERE id=$7  RETURNING *`,
+  //              [customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status,bookingId ]
+  //       ) ;
 
-   }
+
+  //       if( role ==="admin" &&  status === "returned"){
+          
+
+
+  //       }
+
+
+
+
+  //       return result;  
+
+  //  }
+
+
+  const updateBooking = async (
+  customer_id: number,vehicle_id: number,rent_start_date: string,
+  rent_end_date: string,total_price: number,status: string,role: string,bookingId: string) => {
+  
+  
+    // 1. Update the booking
+  const result = await pool.query(
+    `UPDATE bookings SET customer_id=$1, vehicle_id=$2, rent_start_date=$3, rent_end_date=$4, total_price=$5, status=$6 WHERE id=$7
+     RETURNING *`,[customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status, bookingId]
+  );
+
+  const booking = result.rows[0];
+
+  if (!booking) return result;
+
+  // vehicle status update
+  if (status === "cancelled") {
+    //if Customer cancelled  vehicle becomes available
+    await pool.query(`UPDATE vehicles SET availability_status='available' WHERE id=$1`, [vehicle_id]);
+  }
+
+  if (role === "admin" && status === "returned") {
+    // Admin marked as returned vehicle becomes available
+    await pool.query(`UPDATE vehicles SET availability_status='available' WHERE id=$1`, [vehicle_id]);
+
+    // Optional: attach vehicle availability info in response
+    booking.vehicle = { availability_status: "available" };
+  }
+
+  return { rows: [booking] };
+};
+
 
 
    export const bookingService = { createBooking, getAllBooking,updateBooking };

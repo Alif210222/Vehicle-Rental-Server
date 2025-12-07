@@ -8,7 +8,7 @@ const auth = (...roles:string[]) =>{
 
      try {
            const token = req.headers.authorization?.split(" ")[1]
-        console.log(token)
+        // console.log(token)
           if(!token){
                   throw new Error("You are not authorized") 
             }
@@ -28,14 +28,14 @@ const auth = (...roles:string[]) =>{
                  role: decoded.role
              };
 
-              //* role wise access
+              // role wise access
             if(roles.length && !roles.includes(decoded.role)) {
                 return res.status(500).json({
                     error:"Unauthorized Access",
                 })
             }
             
-            console.log(decoded);
+            // console.log(decoded);
            
 
        next();

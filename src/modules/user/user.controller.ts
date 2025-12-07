@@ -73,11 +73,26 @@ const getUser = async(req:Request,res:Response)=>{
 
   const updateUser = async(req:Request,res:Response)=>{
          const {name,email,password,phone,role} = req.body;
+         const targetUserId = req.params.userId;    // user updated 
+         const loggedInUser = req.user;  // for getting login user 
     
     //  console.log(result);
-    try {
+    try {   
+       if (loggedInUser!.role === "customer" && loggedInUser!.id !== Number(targetUserId)) {
+      return res.status(403).json({
+        success: false,
+        message: "Customers can only update their own profile"
+      });
+    }
+
+    // Customers cannot update role
+    let roleToUpdate = role;
+    if (loggedInUser!.role === "customer") {
+      roleToUpdate = undefined;
+    }
+
           const result = await userService.updateUser
-          (name,email,password,phone,role,req.params.userId as string );
+          ({name,email,password,phone,role: roleToUpdate}, targetUserId!);
 
         if(result.rows.length === 0){
             return res.status(404).json({
@@ -93,10 +108,13 @@ const getUser = async(req:Request,res:Response)=>{
                })
            }
     } catch (error:any) {
+       console.error("Update Error:", error); 
+
            res.status(500).json({
-             success: false,
-             message:"Update request failed !",
-           })        
+           success: false,
+           message: "Update request failed !",
+           error: error.message, 
+  });      
   }}
 
 
@@ -108,20 +126,20 @@ const getUser = async(req:Request,res:Response)=>{
         if(result.rows.length === 0){
             return res.status(404).json({
                    success:false,
-                    message:"User delete successfull"
+                    message:"User not found"
             });
           }
            else{
                res.status(200).json({
                    success:true,
                    message:"User delete successfully",
-                   data:result.rows,
+                  
                })
            }
     } catch (error:any) {
            res.status(500).json({
-             success: false,
-             message:"Upate request failed !",
+             success: true,
+             message:error.message,
            })        
   }}
 

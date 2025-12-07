@@ -107,7 +107,7 @@ const  addVehicle = async(req:Request,res:Response)=>{
             if(result.rowCount === 0 ){
             res.status(404).json({
                 success:false,
-                message:"Vehicle not successfully"
+                message:"Vehicle not found "
             })
         }
          else{
