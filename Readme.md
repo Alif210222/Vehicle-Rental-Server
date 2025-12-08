@@ -1,6 +1,6 @@
 # Vehicle Rental Management System — Server (Node.js + Express + PostgreSQL)
 
-### Live URL : https://vehicle-rental-server-six.vercel.app/ 
+### Live URL : https://vehicle-server.vercel.app/ 
 
 # Features : 
 
