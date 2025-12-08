@@ -15,7 +15,7 @@ const  createBooking = async(req:Request,res:Response)=>{
     } catch (error:any) {
           console.error("Booking creation error:", error.message);
            res.status(500).json({
-               success: true,
+               success: false,
                message:"Booking creation failed",
                error: error.message
   })        

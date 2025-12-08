@@ -9,17 +9,26 @@ const auth = (...roles:string[]) =>{
      try {
            const token = req.headers.authorization?.split(" ")[1]
         // console.log(token)
-          if(!token){
-                  throw new Error("You are not authorized") 
+              if(!token){
+                   return res.status(401).json({
+                    message: "You are not allowed",
+                })
             }
            
             const decoded = jwt.verify(token,config.jwtSecret as string) as JwtPayload;
+
+            //Getting user from db for 
             const user  = await pool.query(
                 `SELECT * FROM users WHERE email=$1`, [decoded.email]
             )
-            if(user.rows.length === 0 ){
-                throw new Error ("User not found");
-            }
+
+            
+      if (user.rows.length === 0) {
+        return res.status(401).json({
+          success: false,
+          message: "User not found",
+        });
+      }
 
 
             req.user = {
@@ -30,18 +39,18 @@ const auth = (...roles:string[]) =>{
 
               // role wise access
             if(roles.length && !roles.includes(decoded.role)) {
-                return res.status(500).json({
+                return res.status(403).json({
                     error:"Unauthorized Access",
                 })
             }
             
             // console.log(decoded);
-           
-
+        
        next();
+
      } catch (error:any) {
-               res.status(500).json({
-                    success:true,
+               res.status(401).json({
+                    success:false,
                     message:error.message,
                 })   
      }

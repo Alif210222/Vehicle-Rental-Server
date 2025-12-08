@@ -146,45 +146,87 @@ const getAllBooking = async (role: string, userId: number) => {
 
   //       }
 
-
-
-
   //       return result;  
 
   //  }
 
 
-  const updateBooking = async (
-  customer_id: number,vehicle_id: number,rent_start_date: string,
-  rent_end_date: string,total_price: number,status: string,role: string,bookingId: string) => {
-  
-  
-    // 1. Update the booking
-  const result = await pool.query(
-    `UPDATE bookings SET customer_id=$1, vehicle_id=$2, rent_start_date=$3, rent_end_date=$4, total_price=$5, status=$6 WHERE id=$7
-     RETURNING *`,[customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status, bookingId]
+const updateBooking = async (
+  customer_id: number,
+  vehicle_id: number,
+  rent_start_date: string,
+  rent_end_date: string,
+  total_price: number,
+  status: string,
+  role: string,
+  bookingId: string
+) => {
+
+  // 1. Get booking details for validation
+  const bookingsRes = await pool.query(
+    `SELECT rent_start_date, status FROM bookings WHERE id=$1`,
+    [bookingId]
   );
 
-  const booking = result.rows[0];
-
-  if (!booking) return result;
-
-  // vehicle status update
-  if (status === "cancelled") {
-    //if Customer cancelled  vehicle becomes available
-    await pool.query(`UPDATE vehicles SET availability_status='available' WHERE id=$1`, [vehicle_id]);
+  if (bookingsRes.rows.length === 0) {
+    throw new Error("No booking found");
   }
 
+  const bookingData = bookingsRes.rows[0];
+
+  const today = new Date();
+  const rentStart = new Date(bookingData.rent_start_date);
+
+  // ============================
+  // CUSTOMER — Cancel Booking
+  // ============================
+  if (role === "customer" && status === "cancelled") {
+    if (today >= rentStart) {
+      throw new Error("You can only cancel the booking before the start date");
+    }
+  }
+
+  // ============================
+  // 2. Update Booking
+  // ============================
+  const result = await pool.query(
+    `UPDATE bookings 
+     SET customer_id=$1, vehicle_id=$2, rent_start_date=$3, rent_end_date=$4, 
+         total_price=$5, status=$6 
+     WHERE id=$7 
+     RETURNING *`,
+    [customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status, bookingId]
+  );
+
+  const updatedBooking = result.rows[0];
+  if (!updatedBooking) return result;
+
+  // ============================
+  // VEHICLE STATUS UPDATES
+  // ============================
+
+  // CUSTOMER: Cancel booking → vehicle becomes available
+  if (role === "customer" && status === "cancelled") {
+    await pool.query(
+      `UPDATE vehicles SET availability_status='available' WHERE id=$1`,
+      [vehicle_id]
+    );
+  }
+
+  // ADMIN: Mark as returned → vehicle becomes available
   if (role === "admin" && status === "returned") {
-    // Admin marked as returned vehicle becomes available
-    await pool.query(`UPDATE vehicles SET availability_status='available' WHERE id=$1`, [vehicle_id]);
+    await pool.query(
+      `UPDATE vehicles SET availability_status='available' WHERE id=$1`,
+      [vehicle_id]
+    );
 
-    // Optional: attach vehicle availability info in response
-    booking.vehicle = { availability_status: "available" };
+    // add returned vehicle status in response
+    updatedBooking.vehicle = { availability_status: "available" };
   }
 
-  return { rows: [booking] };
+  return { rows: [updatedBooking] };
 };
+
 
 
 

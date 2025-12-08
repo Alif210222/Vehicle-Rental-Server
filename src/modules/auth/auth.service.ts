@@ -15,13 +15,14 @@ const loginUser = async(email :string,password:string) =>{
        }
 
         const user = result.rows[0];
-        const match = await bcrypt.compare(password,user.password);
+        const match = await bcrypt.compare(password,user.password); // this bcrypt compare the login user password(hashing)   vs database user
 
        if(!match){
           throw new Error("Invalid credential");
        };
 
        const secret = config.jwtSecret;
+       //create token with id,email,role
        const token = jwt.sign({id:user.id, name: user.name, email:user.email, role:user.role}, secret as string , {expiresIn: "20d"} )
     //    console.log({token});
 

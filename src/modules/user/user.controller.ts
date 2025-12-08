@@ -22,6 +22,7 @@ const createUser = async(req:Request,res:Response)=>{
            })        
   }}
 
+
   // get all user
 const getUser = async(req:Request,res:Response)=>{
     //  console.log(result);
@@ -138,7 +139,7 @@ const getUser = async(req:Request,res:Response)=>{
            }
     } catch (error:any) {
            res.status(500).json({
-             success: true,
+             success: false,
              message:error.message,
            })        
   }}
