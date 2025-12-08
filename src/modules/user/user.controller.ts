@@ -18,7 +18,7 @@ const createUser = async(req:Request,res:Response)=>{
     } catch (error:any) {
            res.status(500).json({
              success: false,
-             message:"User created failed",
+             message:"Failed ! Email must be unique and password atlist 6 carecter ! ",
            })        
   }}
 

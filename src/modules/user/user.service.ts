@@ -5,6 +5,13 @@ import { pool } from "../../config/db"
 const createUser = async(payload : Record<string,unknown>) =>{
     const {name,email,password,phone,role} = payload;
 
+
+    // ✅ Password length check
+    if (!password || typeof password !== "string" || password.length < 6) {
+        throw new Error("Password must be at least 6 characters long");
+    }
+
+
     const hashedPassword = await bcrypt.hash(password as string,12)
      const result = await pool.query(
             `INSERT INTO users(name,email,password,phone,role) VALUES($1,$2,$3,$4,$5) RETURNING *`,[name,email,hashedPassword,phone,role]
